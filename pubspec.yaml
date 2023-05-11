@@ -25,8 +25,8 @@ environment:
 dependencies:
   firebase_auth: ^4.5.0
   cupertino_icons: ^1.0.2
-  firebase_core: ^2.11.0
-  cloud_firestore: ^4.6.0
+  google_fonts: ^4.0.4
+
 
   flutter:
     sdk: flutter
