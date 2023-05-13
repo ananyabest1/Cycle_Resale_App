@@ -16,11 +16,11 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Material(
       child: Container(
-        padding: EdgeInsets.only(top: 100, bottom: 40),
+        padding: EdgeInsets.only(top: 270, bottom: 30),
         decoration: BoxDecoration(
-          color: Colors.black,
+          color: Colors.yellow,
           image: DecorationImage(
-            image: NetworkImage("https://iphoneswallpapers.com/wp-content/uploads/2021/09/Make-Big-Goals.jpg"),
+            image: NetworkImage("https://i.pinimg.com/originals/ef/e0/ff/efe0ffdb5b698ee71ed12c4e4be061fb.jpg"),
             fit: BoxFit.cover,
             opacity: 0.6,
           ),
@@ -28,19 +28,19 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text("Info Guild" , style: GoogleFonts.pacifico(
-              fontSize: 50,
-              color: Colors.white,
+            Text("WELCOME" , style: GoogleFonts.lakkiReddy(
+              fontSize: 75,
+              color: Colors.black,
             ),),
-            SizedBox( height: 25),
+            SizedBox( height: 30),
             Column(
               children: [
-                Text("Be Confident, Be Optimistic",
-                  style: GoogleFonts.pacifico(
+                Text("Punctuality is the politeness of kings",
+                  style: GoogleFonts.lancelot(
                     fontSize: 30,
-                    color: Colors.white,
+                    color: Colors.black,
                   ), ),
-                SizedBox(height: 80),
+                SizedBox(height: 170),
                 InkWell(
                   onTap: () {
                     Navigator.pushNamed(context, LoginScreen.id);
@@ -49,7 +49,7 @@ class _SplashScreenState extends State<SplashScreen> {
                     child: Container(
                       padding: EdgeInsets.symmetric(vertical: 15 , horizontal: 30),
                       decoration: BoxDecoration(
-                        color: Color(0xFFE57734),
+                        color: Colors.black,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
@@ -64,6 +64,7 @@ class _SplashScreenState extends State<SplashScreen> {
                     ),
                   ),
                 ),
+                SizedBox(height: 65,)
               ],
             ),
           ],
