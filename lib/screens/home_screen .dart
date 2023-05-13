@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class HomeScreen extends StatefulWidget {
-  static const String id = 'chat_screen';
+  static const String id = 'home_screen';
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }

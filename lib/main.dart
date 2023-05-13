@@ -12,10 +12,10 @@ String loggedUser = "";
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp( InfoGuild());
+  runApp( OnlineAttendance());
 }
 
-class InfoGuild extends StatelessWidget {
+class OnlineAttendance extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
