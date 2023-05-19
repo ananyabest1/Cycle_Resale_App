@@ -30,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
       print(e);
     }
   }
-
+  int currentIndex = 0;
   List<IconData> navigationIcons = [
     FontAwesomeIcons.calendarAlt,
     FontAwesomeIcons.check,
@@ -40,10 +40,11 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Text(
-          "Home",
-        ),
+      body: IndexedStack(
+        index: currentIndex,
+        children: [
+
+        ],
       ),
       bottomNavigationBar: Container(
         height: 70,
@@ -71,8 +72,32 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               for (int i = 0; i < navigationIcons.length; i++) ...[
                 Expanded(
-                  child: Center(
-                    child: Icon(navigationIcons[i]),
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        currentIndex = i;
+                      });
+                    },
+                    child: Container(
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                                navigationIcons[i]
+                            ),
+                            Container(
+                              margin: EdgeInsets.only(top: 6),
+                              height: 3,
+                              width: 22,
+                              decoration: BoxDecoration(
+                                borderRadius: const BorderRadius.all(Radius.circular(40))
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ]
