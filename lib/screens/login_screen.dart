@@ -107,7 +107,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
           )),
     );
-
     return Scaffold(
       backgroundColor: Colors.yellow,
       body: Center(
