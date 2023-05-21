@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:online_attendance_app/model/user.dart';
 import 'package:online_attendance_app/screens/calendarscreen.dart';
 import 'package:online_attendance_app/screens/profilescreen.dart';
 import 'package:online_attendance_app/screens/todayscreen.dart';
+
 
 class HomeScreen extends StatefulWidget {
   static const String id = 'home_screen';
