@@ -123,7 +123,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: <Widget>[
                     SizedBox(
                         height: 200,
-                        child:  Image.network("https://thumbs.dreamstime.com/b/skills-users-avatar-yellow-neon-icon-transparent-background-vector-dark-192438962.jpg'"),
+                        child:  Image.network("https://cdn-icons-png.flaticon.com/512/295/295128.png"),
                         ),
                     SizedBox(height: 45),
                     emailField,
