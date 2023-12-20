@@ -111,11 +111,11 @@ class _LoginPageState extends State<LoginPage> {
           )),
     );
     return Scaffold(
-      backgroundColor: Colors.yellow,
+      backgroundColor: const Color(0xFFD67BFF),
       body: Center(
         child: SingleChildScrollView(
           child: Container(
-            color: Colors.yellow,
+            color: const Color(0xFFD67BFF),
             child: Padding(
               padding: const EdgeInsets.all(36.0),
               child: Form(
@@ -126,7 +126,7 @@ class _LoginPageState extends State<LoginPage> {
                   children: <Widget>[
                     SizedBox(
                       height: 200,
-                      child:  Image.network("https://cdn-icons-png.flaticon.com/512/295/295128.png"),
+                      child:  Image.network("https://www.nicepng.com/png/full/207-2073249_open-user-icon-for-login-page.png"),
                     ),
                     SizedBox(height: 45),
                     emailField,
