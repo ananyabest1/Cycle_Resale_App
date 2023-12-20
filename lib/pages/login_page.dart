@@ -1,16 +1,19 @@
+import 'package:cycle_resale_app/pages/registration_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:online_attendance_app/screens/registration_screen.dart';
-import 'home_screen .dart';
 
-class LoginScreen extends StatefulWidget {
-  static const String id = 'login_screen';
+import 'home_page.dart';
+
+class LoginPage extends StatefulWidget {
+  const LoginPage({Key? key}) : super(key: key);
+
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  _LoginPageState createState() => _LoginPageState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginPageState extends State<LoginPage> {
   // form key
   final _formKey = GlobalKey<FormState>();
 
@@ -122,9 +125,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     SizedBox(
-                        height: 200,
-                        child:  Image.network("https://cdn-icons-png.flaticon.com/512/295/295128.png"),
-                        ),
+                      height: 200,
+                      child:  Image.network("https://cdn-icons-png.flaticon.com/512/295/295128.png"),
+                    ),
                     SizedBox(height: 45),
                     emailField,
                     SizedBox(height: 25),
@@ -142,7 +145,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) =>
-                                          RegistrationScreen()));
+                                          RegistrationPage()));
                             },
                             child: Text(
                               "SignUp",
@@ -153,13 +156,13 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           )
                         ])
-              ],),
-                ),
+                  ],),
               ),
             ),
           ),
-    ),
-        );
+        ),
+      ),
+    );
   }
 
   // login function
@@ -171,7 +174,7 @@ class _LoginScreenState extends State<LoginScreen> {
             .then((uid) => {
           Fluttertoast.showToast(msg: "Login Successful"),
           Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => HomeScreen())),
+              MaterialPageRoute(builder: (context) => HomePage())),
         });
       } on FirebaseAuthException catch (error) {
         switch (error.code) {
