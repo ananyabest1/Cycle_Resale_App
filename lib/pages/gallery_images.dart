@@ -1,139 +1,179 @@
 import 'dart:io';
-import 'dart:typed_data';
-import 'package:cycle_resale_app/pages/camera_image_cart_page.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cycle_resale_app/pages/info_page.dart';
 
-class GalleryImage extends StatefulWidget {
-  const GalleryImage({Key? key}) : super(key: key);
-
-  @override
-  State<GalleryImage> createState() => _GalleryImageState();
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(MyApp());
 }
 
-class _GalleryImageState extends State<GalleryImage> {
-  Uint8List? _image;
-  File? selectedImage;
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: GalleryImagePage(),
+    );
+  }
+}
+
+class GalleryImagePage extends StatefulWidget {
+  @override
+  _GalleryImagePageState createState() => _GalleryImagePageState();
+}
+
+class _GalleryImagePageState extends State<GalleryImagePage> {
+  final DatabaseReference _databaseReference =
+  FirebaseDatabase.instance.reference().child('userSubmissions');
+
+  final TextEditingController organizationController = TextEditingController();
+  final TextEditingController contactPersonController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController phoneNumberController = TextEditingController();
+
+  String _imagePath = ''; // Initialize to an empty string
+
+  // Function to pick an image from the gallery
+  Future<void> _pickImageFromGallery() async {
+    final imagePicker = ImagePicker();
+    final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _imagePath = pickedFile.path;
+      });
+    }
+  }
+
+  // Function to take a picture from the camera
+  Future<void> _takePicture() async {
+    final imagePicker = ImagePicker();
+    final pickedFile = await imagePicker.pickImage(source: ImageSource.camera);
+    if (pickedFile != null) {
+      setState(() {
+        _imagePath = pickedFile.path;
+      });
+    }
+  }
+  Future<String> _uploadImageToStorage(String imagePath) async {
+    File file = File(imagePath);
+    FirebaseStorage storage = FirebaseStorage.instance;
+    Reference storageReference =
+    storage.ref().child('user_images/${DateTime.now().millisecondsSinceEpoch}');
+    UploadTask uploadTask = storageReference.putFile(file);
+
+    try {
+      await uploadTask.whenComplete(() => null); // Wait for the upload to complete
+      String downloadURL = await storageReference.getDownloadURL();
+      return downloadURL;
+    } catch (error) {
+      print('Error uploading image: $error');
+      return Future.error('Image upload failed: $error');
+    }
+  }
+
+  void _submitForm() async {
+    try {
+      if (_imagePath.isEmpty) {
+        print('Please pick an image before submitting the form.');
+        return;
+      }
+
+      String imageUrl = await _uploadImageToStorage(_imagePath);
+
+      if (imageUrl.isNotEmpty) {
+        await _databaseReference.push().set({
+          'organizationName': organizationController.text,
+          'contactPersonName': contactPersonController.text,
+          'email': emailController.text,
+          'phoneNumber': phoneNumberController.text,
+          'imageUrl': imageUrl,
+          // Add more fields as needed
+        });
+
+        print('Form submitted successfully with imageUrl: $imageUrl');
+
+        // Navigate to InfoPage with the image URL
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) => InfoPage(imageUrl: imageUrl)),
+        );
+      } else {
+        print('Error: Image upload failed. ImageURL is empty.');
+      }
+    } catch (error) {
+      print('Error submitting form: $error');
+    }
+  }
+  @override
+  void dispose() {
+    organizationController.dispose();
+    contactPersonController.dispose();
+    emailController.dispose();
+    phoneNumberController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.deepPurple[100],
-      body: Center(
-        child: Stack(
-          children: [
-            InkWell(
-              onTap: () {
-                if (_image != null) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => CameraImagePage(image: _image!),
-                    ),
-                  );
-                } else {
-                  showImagePickerOption(context);
-                }
-              },
-              child: _image != null
-                  ? CircleAvatar(
-                  radius: 100, backgroundImage: MemoryImage(_image!))
-                  : const CircleAvatar(
-                radius: 100,
-                backgroundImage: NetworkImage(
-                    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFQT9u0pMwBgm8tygo_5_DnAS0E4XXylKSOh83T9Qk940d1u4JtojNe71wVHTm-IFhVDM&usqp=CAU"),
-              ),
-            ),
-            Positioned(
-              bottom: -0,
-              left: 140,
-              child: IconButton(
-                onPressed: () {
-                  showImagePickerOption(context);
-                },
-                icon: Icon(Icons.add_a_photo),
-              ),
-            ),
-          ],
+      backgroundColor: const Color(0xFFD67BFF),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFD67BFF),
+        title: Text(
+          'Provide Your Cycle Information',
+          style: TextStyle(color: Colors.black),
         ),
+      ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          TextFormField(
+            key: Key('organizationName'),
+            controller: organizationController,
+            decoration: InputDecoration(labelText: 'Organization Name'),
+          ),
+          TextFormField(
+            key: Key('contactPersonName'),
+            controller: contactPersonController,
+            decoration: InputDecoration(labelText: 'Contact Person Name'),
+          ),
+          TextFormField(
+            key: Key('email'),
+            controller: emailController,
+            decoration: InputDecoration(labelText: 'Email'),
+          ),
+          TextFormField(
+            key: Key('phoneNumber'),
+            controller: phoneNumberController,
+            decoration: InputDecoration(labelText: 'Phone Number'),
+          ),
+          ElevatedButton(
+            onPressed: _pickImageFromGallery,
+            style: ElevatedButton.styleFrom(
+              primary: Colors.black,
+            ),
+            child: Text('Pick Image from Gallery'),
+          ),
+          ElevatedButton(
+            onPressed: _takePicture,
+            style: ElevatedButton.styleFrom(
+              primary: Colors.black,
+            ),
+            child: Text('Take Picture'),
+          ),
+          ElevatedButton(
+            onPressed: _submitForm,
+            style: ElevatedButton.styleFrom(
+              primary: Colors.black,
+            ),
+            child: Text('Submit'),
+          ),
+        ],
       ),
     );
   }
-
-  void showImagePickerOption(BuildContext context) {
-    showModalBottomSheet(
-      backgroundColor: Colors.blue[100],
-      context: context,
-      builder: (builder) {
-        return Padding(
-          padding: const EdgeInsets.all(18.0),
-          child: SizedBox(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height / 4.5,
-            child: Row(
-              children: [
-                Expanded(
-                  child: InkWell(
-                    onTap: () {
-                      _pickImageFromGallery();
-                    },
-                    child: Column(
-                      children: [
-                        Icon(
-                          Icons.image,
-                          size: 70,
-                        ),
-                        Text("Gallery"),
-                      ],
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: InkWell(
-                    onTap: () {
-                      _pickImageFromCamera();
-                    },
-                    child: Column(
-                      children: [
-                        Icon(
-                          Icons.image,
-                          size: 70,
-                        ),
-                        Text("Camera"),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  // Gallery
-  Future _pickImageFromGallery() async {
-    final returnImage =
-    await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (returnImage == null) return;
-    setState(() {
-      selectedImage = File(returnImage.path);
-      _image = File(returnImage.path).readAsBytesSync();
-    });
-    Navigator.of(context).pop(); // close the modal sheet
-  }
-
-  // Camera
-  Future _pickImageFromCamera() async {
-    final returnImage =
-    await ImagePicker().pickImage(source: ImageSource.camera);
-    if (returnImage == null) return;
-    setState(() {
-      selectedImage = File(returnImage.path);
-      _image = File(returnImage.path).readAsBytesSync();
-    });
-    Navigator.of(context).pop();
-  }
 }
-
