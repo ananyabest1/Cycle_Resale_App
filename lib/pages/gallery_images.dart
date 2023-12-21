@@ -1,11 +1,11 @@
+import 'dart:io';
 import 'dart:typed_data';
-
+import 'package:cycle_resale_app/pages/camera_image_cart_page.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
 
 class GalleryImage extends StatefulWidget {
-  const GalleryImage({Key? key, required  onImageSelected, required void Function(Uint8List image) setImage}) : super(key: key);
+  const GalleryImage({Key? key}) : super(key: key);
 
   @override
   State<GalleryImage> createState() => _GalleryImageState();
@@ -13,23 +13,45 @@ class GalleryImage extends StatefulWidget {
 
 class _GalleryImageState extends State<GalleryImage> {
   Uint8List? _image;
+  File? selectedImage;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFD67BFF),
+      backgroundColor: Colors.deepPurple[100],
       body: Center(
         child: Stack(
           children: [
-            _buildProfileImage(),
+            InkWell(
+              onTap: () {
+                if (_image != null) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CameraImagePage(image: _image!),
+                    ),
+                  );
+                } else {
+                  showImagePickerOption(context);
+                }
+              },
+              child: _image != null
+                  ? CircleAvatar(
+                  radius: 100, backgroundImage: MemoryImage(_image!))
+                  : const CircleAvatar(
+                radius: 100,
+                backgroundImage: NetworkImage(
+                    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFQT9u0pMwBgm8tygo_5_DnAS0E4XXylKSOh83T9Qk940d1u4JtojNe71wVHTm-IFhVDM&usqp=CAU"),
+              ),
+            ),
             Positioned(
-              bottom: 0,
+              bottom: -0,
               left: 140,
-              child: Column(
-                children: [
-                  _buildAddPhotoButton(),
-                  if (_image != null) _buildGoToCartButton(),
-                ],
+              child: IconButton(
+                onPressed: () {
+                  showImagePickerOption(context);
+                },
+                icon: Icon(Icons.add_a_photo),
               ),
             ),
           ],
@@ -38,44 +60,9 @@ class _GalleryImageState extends State<GalleryImage> {
     );
   }
 
-  Widget _buildProfileImage() {
-    return _image != null
-        ? CircleAvatar(radius: 100, backgroundImage: MemoryImage(_image!))
-        : const CircleAvatar(
-      radius: 100,
-      backgroundImage: NetworkImage(
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFQT9u0pMwBgm8tygo_5_DnAS0E4XXylKSOh83T9Qk940d1u4JtojNe71wVHTm-IFhVDM&usqp=CAU"),
-    );
-  }
-
-  Widget _buildAddPhotoButton() {
-    return IconButton(
-      onPressed: () {
-        showImagePickerOption(context);
-      },
-      icon: const Icon(Icons.add_a_photo),
-    );
-  }
-
-  Widget _buildGoToCartButton() {
-    return ElevatedButton(
-      onPressed: () {
-        if (_image != null) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => CartPage(imageBytes: _image!),
-            ),
-          );
-        }
-      },
-      child: const Text('Go to Cart'),
-    );
-  }
-
   void showImagePickerOption(BuildContext context) {
     showModalBottomSheet(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.blue[100],
       context: context,
       builder: (builder) {
         return Padding(
@@ -88,7 +75,7 @@ class _GalleryImageState extends State<GalleryImage> {
                 Expanded(
                   child: InkWell(
                     onTap: () {
-                      _pickImageFromGallery(context);
+                      _pickImageFromGallery();
                     },
                     child: Column(
                       children: [
@@ -96,7 +83,7 @@ class _GalleryImageState extends State<GalleryImage> {
                           Icons.image,
                           size: 70,
                         ),
-                        const Text("Gallery"),
+                        Text("Gallery"),
                       ],
                     ),
                   ),
@@ -104,15 +91,15 @@ class _GalleryImageState extends State<GalleryImage> {
                 Expanded(
                   child: InkWell(
                     onTap: () {
-                      _pickImageFromCamera(context);
+                      _pickImageFromCamera();
                     },
                     child: Column(
                       children: [
                         Icon(
-                          Icons.camera_alt,
+                          Icons.image,
                           size: 70,
                         ),
-                        const Text("Camera"),
+                        Text("Camera"),
                       ],
                     ),
                   ),
@@ -125,57 +112,28 @@ class _GalleryImageState extends State<GalleryImage> {
     );
   }
 
-  Future<void> _pickImageFromGallery(BuildContext context) async {
-    final pickedImage =
+  // Gallery
+  Future _pickImageFromGallery() async {
+    final returnImage =
     await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (pickedImage == null) return;
-
-    final selectedImage = File(pickedImage.path);
-    final imageBytes = await selectedImage.readAsBytes();
-
+    if (returnImage == null) return;
     setState(() {
-      _image = imageBytes;
+      selectedImage = File(returnImage.path);
+      _image = File(returnImage.path).readAsBytesSync();
     });
-
-    Navigator.of(context).pop(); // Close the modal sheet
+    Navigator.of(context).pop(); // close the modal sheet
   }
 
-  Future<void> _pickImageFromCamera(BuildContext context) async {
-    final pickedImage =
+  // Camera
+  Future _pickImageFromCamera() async {
+    final returnImage =
     await ImagePicker().pickImage(source: ImageSource.camera);
-    if (pickedImage == null) return;
-
-    final selectedImage = File(pickedImage.path);
-    final imageBytes = await selectedImage.readAsBytes();
-
+    if (returnImage == null) return;
     setState(() {
-      _image = imageBytes;
+      selectedImage = File(returnImage.path);
+      _image = File(returnImage.path).readAsBytesSync();
     });
-
-    Navigator.of(context).pop(); // Close the modal sheet
+    Navigator.of(context).pop();
   }
 }
 
-class CartPage extends StatelessWidget {
-  final Uint8List imageBytes;
-
-  const CartPage({Key? key, required this.imageBytes}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Cart Page'),
-      ),
-      body: Center(
-        child: Image.memory(imageBytes),
-      ),
-    );
-  }
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: GalleryImage(onImageSelected: null, setImage: (Uint8List image) {  },),
-  ));
-}

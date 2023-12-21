@@ -1,13 +1,11 @@
-import 'package:cycle_resale_app/model/cart_model.dart';
 import 'package:cycle_resale_app/pages/payment_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'dart:typed_data'; // Import this for Uint8List
+import '../model/cart_model.dart';
 
 class CartPage extends StatelessWidget {
-  final Uint8List? imageBytes;
-  const CartPage({Key? key, required this.imageBytes}) : super(key: key);
+  const CartPage({super.key});
 
   @override
   Widget build(BuildContext context) {
