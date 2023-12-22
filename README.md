@@ -1,3 +1,1 @@
-# online_attendance_app
-
-This app is made for employees to mark easy attendance at workplace .
+This application aims to alleviate challenges encountered by college students when reselling their bicycles within the campus. It provides a solution for the difficulties faced during the process of selling and purchasing cycles within the college community.
